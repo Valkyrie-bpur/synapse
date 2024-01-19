@@ -94,7 +94,7 @@ namespace Synapse.Application.Commands.Correlations
             IAsyncEnumerable<V1Correlation> correlations = await this.Mediator.ExecuteAndUnwrapAsync(new V1GetEventCorrelationsQuery(command.Event), cancellationToken);
             await foreach (V1Correlation correlation in correlations)
             {
-                this.Logger.LogInformation("======== Processing correlation with id '{correlationId}'...", correlation.Id);
+                this.Logger.LogInformation("Processing correlation with id '{correlationId}'...", correlation.Id);
                 V1CorrelationCondition matchingCondition = correlation.GetMatchingConditionFor(command.Event)!;
                 V1EventFilter matchingFilter = matchingCondition.GetMatchingFilterFor(command.Event)!;
                 List<V1CorrelationContext> matchingContexts = correlation.Contexts

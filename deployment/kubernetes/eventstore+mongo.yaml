@@ -127,7 +127,7 @@ spec:
       serviceAccountName: synapse
       containers:
         - name: synapse
-          image: bpurnot/synapse:latest
+          image: bpurnot/synapse:0.0.4
           imagePullPolicy: IfNotPresent
           env:
             - name: KUBERNETES_POD_NAME
