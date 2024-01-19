@@ -146,6 +146,8 @@ namespace Synapse.Worker.Services.Processors
                     || (!string.IsNullOrWhiteSpace(this.EventDefinition.Type) && !Regex.IsMatch(e.Type!, this.EventDefinition.Type, RegexOptions.IgnoreCase)))
                     return;
                 var enveloppe = V1Event.CreateFrom(e);
+                this.Logger.LogInformation("==== Envelope created with these {contextId}: ", enveloppe);
+
                 if (!await this.Context.Workflow.TryCorrelateAsync(enveloppe, this.EventDefinition.Correlations?.Select(c => c.ContextAttributeName)!, this.CancellationTokenSource.Token))
                     return;
                 object output;
@@ -153,6 +155,7 @@ namespace Synapse.Worker.Services.Processors
                     output = e.Data!;
                 else
                     output = enveloppe;
+                this.Logger.LogInformation("==== Output {contextId}: ", output);
                 await this.OnNextAsync(new V1WorkflowActivityCompletedIntegrationEvent(this.Activity.Id, output), this.CancellationTokenSource.Token);
                 await this.OnCompletedAsync(this.CancellationTokenSource.Token);
             }

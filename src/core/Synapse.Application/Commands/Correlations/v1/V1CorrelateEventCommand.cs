@@ -190,13 +190,23 @@ namespace Synapse.Application.Commands.Correlations
                 default:
                     throw new NotSupportedException($"The specified {nameof(V1CorrelationOutcomeType)} '{correlation.Outcome.Type}' is not supported");
             }
+
+            if (correlation.Lifetime == V1CorrelationLifetime.Singleton)
+            {
+                // When the event is triggered, delete the pending event from CorrelationContext
+                await this.Mediator.ExecuteAndUnwrapAsync(new V1DeleteCorrelatedEventCommand(correlation.Id, correlationContext.Id, e.Id), cancellationToken);
+            }
+
             correlation.ReleaseContext(correlationContext);
             correlation = await this.Correlations.UpdateAsync(correlation, cancellationToken);
             await this.Correlations.SaveChangesAsync(cancellationToken);
+
             if (correlation.Lifetime == V1CorrelationLifetime.Singleton)
             {
                 this.Logger.LogInformation("The correlation with id '{correlationId}' is a singleton and its context has been released. Disposing of it...", correlation.Id);
+
                 await this.Mediator.ExecuteAndUnwrapAsync(new V1DeleteCorrelationCommand(correlation.Id), cancellationToken);
+
                 this.Logger.LogInformation("The correlation with id '{correlationId}' has been successfully disposed of", correlation.Id);
             }
             this.Logger.LogInformation("Correlation outcome successfully computed");

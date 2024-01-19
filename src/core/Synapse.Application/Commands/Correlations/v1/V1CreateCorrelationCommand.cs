@@ -15,101 +15,57 @@
  *
  */
 
-using Synapse.Application.Commands.WorkflowInstances;
-using System.ComponentModel.DataAnnotations;
-
 namespace Synapse.Application.Commands.Correlations
 {
 
     /// <summary>
-    /// Represents the <see cref="ICommand"/> used to create a new <see cref="V1Correlation"/>
+    /// Represents the <see cref="ICommand"/> used to delete an existing <see cref="V1Correlation"/>
     /// </summary>
-    [DataTransferObjectType(typeof(Integration.Commands.Correlations.V1CreateCorrelationCommand))]
-    public class V1CreateCorrelationCommand
-        : Command<Integration.Models.V1Correlation>
+    [DataTransferObjectType(typeof(Integration.Commands.Correlations.V1DeleteCorrelationCommand))]
+    public class V1DeleteCorrelationCommand
+        : Command
     {
 
         /// <summary>
-        /// Initializes a new <see cref="V1CreateCorrelationCommand"/>
+        /// Initializes a new <see cref="V1DeleteCorrelationCommand"/>
         /// </summary>
-        protected V1CreateCorrelationCommand()
+        protected V1DeleteCorrelationCommand()
         {
-            this.Conditions = null!;
-            this.Outcome = null!;
+            this.Id = null!;
         }
 
         /// <summary>
-        /// Initializes a new <see cref="V1CreateWorkflowInstanceCommand"/>
+        /// Initializes a new <see cref="V1DeleteCorrelationCommand"/>
         /// </summary>
-        /// <param name="activationType">The activation type of the <see cref="V1Correlation"/> to create</param>
-        /// <param name="lifetime">The lifetime of the <see cref="V1Correlation"/> to create</param>
-        /// <param name="conditionType">The type of <see cref="V1CorrelationCondition"/> evaluation the <see cref="V1Correlation"/> should use</param>
-        /// <param name="conditions">An <see cref="IEnumerable{T}"/> containing all <see cref="V1CorrelationCondition"/>s the <see cref="V1Correlation"/> to create is made out of</param>
-        /// <param name="outcome">The <see cref="V1CorrelationOutcome"/> of the <see cref="V1Correlation"/> to create</param>
-        /// <param name="context">The initial <see cref="V1CorrelationContext"/> of the <see cref="V1Correlation"/> to create</param>
-        public V1CreateCorrelationCommand(V1CorrelationActivationType activationType, V1CorrelationLifetime lifetime, V1CorrelationConditionType conditionType, 
-            IEnumerable<V1CorrelationCondition> conditions, V1CorrelationOutcome outcome, V1CorrelationContext? context)
+        /// <param name="id">The id of the <see cref="V1Correlation"/> to delete</param>
+        public V1DeleteCorrelationCommand(string id)
         {
-            this.ActivationType = activationType;
-            this.Lifetime = lifetime;
-            this.ConditionType = conditionType;
-            this.Conditions = conditions.ToList();
-            this.Outcome = outcome;
-            this.Context = context;
+            this.Id = id;
         }
 
         /// <summary>
-        /// Gets the activation type of the <see cref="V1Correlation"/> to create
+        /// Gets the id of the <see cref="V1Correlation"/> to delete
         /// </summary>
-        public virtual V1CorrelationActivationType ActivationType { get; protected set; }
-
-        /// <summary>
-        /// Gets the lifetime of the <see cref="V1Correlation"/> to create
-        /// </summary>
-        [Required]
-        public virtual V1CorrelationLifetime Lifetime { get; protected set; }
-
-        /// <summary>
-        /// Gets the type of <see cref="V1CorrelationCondition"/> evaluation the <see cref="V1Correlation"/> should use
-        /// </summary>
-        [Required]
-        public virtual V1CorrelationConditionType ConditionType { get; protected set; }
-
-        /// <summary>
-        /// Gets an <see cref="IEnumerable{T}"/> containing all <see cref="V1CorrelationCondition"/>s the <see cref="V1Correlation"/> to create is made out of
-        /// </summary>
-        [MinLength(1)]
-        public virtual ICollection<V1CorrelationCondition> Conditions { get; protected set; }
-
-        /// <summary>
-        /// Gets the <see cref="V1CorrelationOutcome"/> of the <see cref="V1Correlation"/> to create
-        /// </summary>
-        [Required]
-        public virtual V1CorrelationOutcome Outcome { get; protected set; }
-
-        /// <summary>
-        /// Gets the initial <see cref="V1CorrelationContext"/> of the <see cref="V1Correlation"/> to create
-        /// </summary>
-        public virtual V1CorrelationContext? Context { get; protected set; }
+        public virtual string Id { get; protected set; }
 
     }
 
     /// <summary>
-    /// Represents the service used to handle <see cref="V1CreateCorrelationCommand"/>s
+    /// Represents the service used to handle <see cref="V1DeleteCorrelationCommand"/>s
     /// </summary>
-    public class V1CreateCorrelationCommandHandler
+    public class V1DeleteCorrelationCommandHandler
         : CommandHandlerBase,
-        ICommandHandler<V1CreateCorrelationCommand, Integration.Models.V1Correlation>
+        ICommandHandler<V1DeleteCorrelationCommand>
     {
 
         /// <summary>
-        /// Initializes a new <see cref="V1CreateCorrelationCommandHandler"/>
+        /// Initializes a new <see cref="V1DeleteCorrelationCommandHandler"/>
         /// </summary>
         /// <param name="loggerFactory">The service used to create <see cref="ILogger"/>s</param>
         /// <param name="mediator">The service used to mediate calls</param>
         /// <param name="mapper">The service used to map objects</param>
         /// <param name="correlations">The <see cref="IRepository"/> used to manage <see cref="V1Correlation"/>s</param>
-        public V1CreateCorrelationCommandHandler(ILoggerFactory loggerFactory, IMediator mediator, IMapper mapper, IRepository<V1Correlation> correlations) 
+        public V1DeleteCorrelationCommandHandler(ILoggerFactory loggerFactory, IMediator mediator, IMapper mapper, IRepository<V1Correlation> correlations)
             : base(loggerFactory, mediator, mapper)
         {
             this.Correlations = correlations;
@@ -121,14 +77,21 @@ namespace Synapse.Application.Commands.Correlations
         protected IRepository<V1Correlation> Correlations { get; }
 
         /// <inheritdoc/>
-        public virtual async Task<IOperationResult<Integration.Models.V1Correlation>> HandleAsync(V1CreateCorrelationCommand command, CancellationToken cancellationToken = default)
+        public virtual async Task<IOperationResult> HandleAsync(V1DeleteCorrelationCommand command, CancellationToken cancellationToken = default)
         {
-            var correlation = new V1Correlation(command.ActivationType, command.Lifetime, command.ConditionType, command.Conditions, command.Outcome, command.Context);
-            correlation = await this.Correlations.AddAsync(correlation, cancellationToken);
-            await this.Correlations.SaveChangesAsync(cancellationToken);
-            return this.Ok(this.Mapper.Map<Integration.Models.V1Correlation>(correlation));
-        }
+            V1Correlation correlation = await this.Correlations.FindAsync(command.Id, cancellationToken);
+            if (correlation == null)
+            {
+                throw DomainException.NullReference(typeof(V1Correlation), command.Id);
+            }
 
+            correlation.Delete();
+            await this.Correlations.UpdateAsync(correlation, cancellationToken);
+            await this.Correlations.RemoveAsync(correlation, cancellationToken);
+            await this.Correlations.SaveChangesAsync(cancellationToken);
+
+            return this.Ok();
+        }
     }
 
 }

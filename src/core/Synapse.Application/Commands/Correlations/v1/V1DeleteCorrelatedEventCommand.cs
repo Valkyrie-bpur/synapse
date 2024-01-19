@@ -36,7 +36,7 @@ namespace Synapse.Application.Commands.Correlations
         /// <param name="correlationId">The id of the <see cref="V1Correlation"/> the <see cref="V1Event"/> to delete belongs to</param>
         /// <param name="contextId">The id of the <see cref="V1CorrelationContext"/> the <see cref="V1Event"/> to delete belongs to</param>
         /// <param name="eventId">The id of the <see cref="V1Event"/> to delete</param>
-        public V1DeleteCorrelatedEventCommand(string correlationId, string contextId,string eventId)
+        public V1DeleteCorrelatedEventCommand(string correlationId, string contextId, string eventId)
         {
             this.CorrelationId = correlationId;
             this.ContextId = contextId;
@@ -89,15 +89,26 @@ namespace Synapse.Application.Commands.Correlations
         /// <inheritdoc/>
         public virtual async Task<IOperationResult> HandleAsync(V1DeleteCorrelatedEventCommand command, CancellationToken cancellationToken = default)
         {
-            var correlation = await this.Correlations.FindAsync(command.CorrelationId, cancellationToken);
-            if (correlation == null) throw DomainException.NullReference(typeof(V1Correlation), command.CorrelationId);
-            var context = correlation.Contexts?.FirstOrDefault(c => c.Id.Equals(command.ContextId, StringComparison.InvariantCultureIgnoreCase));
-            if (context == null) throw DomainException.NullReference(typeof(V1CorrelationContext), command.ContextId);
-            var evt = context.PendingEvents?.FirstOrDefault(e => e.Id.Equals(command.EventId, StringComparison.InvariantCultureIgnoreCase));
-            if (evt == null) throw DomainException.NullReference(typeof(V1Event), command.EventId);
+            V1Correlation correlation = await this.Correlations.FindAsync(command.CorrelationId, cancellationToken);
+            if (correlation == null)
+            {
+                throw DomainException.NullReference(typeof(V1Correlation), command.CorrelationId);
+            }
+            V1CorrelationContext? context = correlation.Contexts?.FirstOrDefault(c => c.Id.Equals(command.ContextId, StringComparison.InvariantCultureIgnoreCase));
+            if (context == null)
+            {
+                throw DomainException.NullReference(typeof(V1CorrelationContext), command.ContextId);
+            }
+            V1Event? evt = context.PendingEvents?.FirstOrDefault(e => e.Id.Equals(command.EventId, StringComparison.InvariantCultureIgnoreCase));
+            if (evt == null)
+            {
+                throw DomainException.NullReference(typeof(V1Event), command.EventId);
+            }
+
             correlation.ReleaseEvent(context, evt);
             await this.Correlations.UpdateAsync(correlation, cancellationToken);
             await this.Correlations.SaveChangesAsync(cancellationToken);
+
             return this.Ok();
         }
 
