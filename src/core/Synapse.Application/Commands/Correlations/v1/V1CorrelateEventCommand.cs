@@ -69,8 +69,8 @@ namespace Synapse.Application.Commands.Correlations
         /// <param name="mapper">The service used to map objects</param>
         /// <param name="correlations">The <see cref="IRepository"/> used to manage <see cref="V1Correlation"/>s</param>
         /// <param name="workflowInstances">The <see cref="IRepository"/> used to manage <see cref="V1WorkflowInstance"/>s</param>
-        public V1CorrelateEventCommandHandler(ILoggerFactory loggerFactory, IMediator mediator, IMapper mapper, 
-            IRepository<V1Correlation> correlations, IRepository<V1WorkflowInstance> workflowInstances) 
+        public V1CorrelateEventCommandHandler(ILoggerFactory loggerFactory, IMediator mediator, IMapper mapper,
+            IRepository<V1Correlation> correlations, IRepository<V1WorkflowInstance> workflowInstances)
             : base(loggerFactory, mediator, mapper)
         {
             this.Correlations = correlations;
@@ -91,24 +91,34 @@ namespace Synapse.Application.Commands.Correlations
         public virtual async Task<IOperationResult> HandleAsync(V1CorrelateEventCommand command, CancellationToken cancellationToken = default)
         {
             this.Logger.LogInformation("Processing event with id '{eventId}', type '{eventType}' and source '{eventSource}'...", command.Event.Id, command.Event.Type, command.Event.Source);
-            var correlations = await this.Mediator.ExecuteAndUnwrapAsync(new V1GetEventCorrelationsQuery(command.Event), cancellationToken);
-            await foreach (var correlation in correlations)
+            IAsyncEnumerable<V1Correlation> correlations = await this.Mediator.ExecuteAndUnwrapAsync(new V1GetEventCorrelationsQuery(command.Event), cancellationToken);
+            await foreach (V1Correlation correlation in correlations)
             {
                 this.Logger.LogInformation("Processing correlation with id '{correlationId}'...", correlation.Id);
-                var matchingCondition = correlation.GetMatchingConditionFor(command.Event)!;
-                var matchingFilter = matchingCondition.GetMatchingFilterFor(command.Event)!;
-                var matchingContexts = correlation.Contexts
+                V1CorrelationCondition matchingCondition = correlation.GetMatchingConditionFor(command.Event)!;
+                V1EventFilter matchingFilter = matchingCondition.GetMatchingFilterFor(command.Event)!;
+                List<V1CorrelationContext> matchingContexts = correlation.Contexts
                     .Where(c => c.CorrelatesTo(command.Event))
                     .ToList();
                 switch (correlation.Lifetime)
                 {
                     case V1CorrelationLifetime.Singleton:
-                        var matchingContext = matchingContexts.FirstOrDefault();
+                        V1CorrelationContext? matchingContext = matchingContexts.FirstOrDefault();
                         if (matchingContext == null)
                         {
                             this.Logger.LogInformation("Failed to find a matching correlation context");
+
                             if (correlation.Contexts.Any())
-                                throw new Exception("Failed to correlate event"); //should not happen
+                            {
+                                this.Logger.LogWarning("Failed to find any correlation.Contexts for correlation id '{correlationId}', for event with id '{eventId}', type '{eventType}' and source '{eventSource}'",
+                                    correlation.Id,
+                                    command.Event.Id,
+                                    command.Event.Type,
+                                    command.Event.Source);
+
+                                continue;
+                            }
+
                             this.Logger.LogInformation("Creating a new correlation context...");
                             matchingContext = V1CorrelationContext.CreateFor(command.Event, matchingFilter.CorrelationMappings.Keys);
                             correlation.AddContext(matchingContext);
@@ -121,7 +131,7 @@ namespace Synapse.Application.Commands.Correlations
                         break;
                     case V1CorrelationLifetime.Transient:
                         matchingContext = matchingContexts.FirstOrDefault();
-                        if(matchingContext == null)
+                        if (matchingContext == null)
                         {
                             this.Logger.LogInformation("Failed to find a matching correlation context");
                             this.Logger.LogInformation("Creating a new correlation context...");
@@ -183,7 +193,7 @@ namespace Synapse.Application.Commands.Correlations
             correlation.ReleaseContext(correlationContext);
             correlation = await this.Correlations.UpdateAsync(correlation, cancellationToken);
             await this.Correlations.SaveChangesAsync(cancellationToken);
-            if(correlation.Lifetime == V1CorrelationLifetime.Singleton)
+            if (correlation.Lifetime == V1CorrelationLifetime.Singleton)
             {
                 this.Logger.LogInformation("The correlation with id '{correlationId}' is a singleton and its context has been released. Disposing of it...", correlation.Id);
                 await this.Mediator.ExecuteAndUnwrapAsync(new V1DeleteCorrelationCommand(correlation.Id), cancellationToken);
