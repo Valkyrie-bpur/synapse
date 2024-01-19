@@ -79,13 +79,17 @@ namespace Synapse.Application.Commands.Correlations
         /// <inheritdoc/>
         public virtual async Task<IOperationResult> HandleAsync(V1DeleteCorrelationCommand command, CancellationToken cancellationToken = default)
         {
-            var correlation = await this.Correlations.FindAsync(command.Id, cancellationToken);
+            V1Correlation correlation = await this.Correlations.FindAsync(command.Id, cancellationToken);
             if (correlation == null)
+            {
                 throw DomainException.NullReference(typeof(V1Correlation), command.Id);
+            }
+
             correlation.Delete();
             await this.Correlations.UpdateAsync(correlation, cancellationToken);
             await this.Correlations.RemoveAsync(correlation, cancellationToken);
             await this.Correlations.SaveChangesAsync(cancellationToken);
+
             return this.Ok();
         }
     }
