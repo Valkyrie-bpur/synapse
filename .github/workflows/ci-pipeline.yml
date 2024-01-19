@@ -9,7 +9,7 @@ on:
 
 jobs:
   versioning:
-    if: github.repository == 'serverlessworkflow/synapse' && github.ref_name == 'main'
+    if: github.repository == 'Valkyrie-bpur/synapse' && github.ref_name == 'main'
     uses: ./.github/workflows/versioning.yml
     secrets: inherit
 

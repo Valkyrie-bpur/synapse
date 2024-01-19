@@ -27,7 +27,7 @@ services:
       - eventstore_data:/var/lib/eventstore
 
   synapse:
-    image: ghcr.io/serverlessworkflow/synapse:latest
+    image: ghcr.io/Valkyrie-bpur/synapse:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - SYNAPSE_API_HOSTNAME=synapse

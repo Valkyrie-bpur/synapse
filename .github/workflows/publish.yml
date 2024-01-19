@@ -22,10 +22,10 @@ jobs:
         run: dotnet restore "./Synapse.sln"
       - name: Build
         run: dotnet build "./Synapse.sln" --configuration Release --no-restore 
-      - name: Push1
-        run: dotnet nuget push "./src/*/*/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-      - name: Push2
-        run: dotnet nuget push "./src/*/*/*/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      #- name: Push1
+      #  run: dotnet nuget push "./src/*/*/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      #- name: Push2
+      #  run: dotnet nuget push "./src/*/*/*/bin/Release/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   publish-server-image:
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
@@ -65,7 +65,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
@@ -130,7 +130,7 @@ jobs:
         with:
           files: "synapse*"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   publish-worker-bin:
     name: Release Worker Binaries
@@ -179,7 +179,7 @@ jobs:
         with:
           files: "synapse-worker*"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           
   publish-cli-bin:
     name: Release CLI Binaries
@@ -228,7 +228,7 @@ jobs:
         with:
           files: "synctl*"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           
   publish-eventstore-plugin:
     runs-on: ubuntu-latest
@@ -257,7 +257,7 @@ jobs:
         with:
           files: "EventStoreRepositoryPlugin*"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           
   publish-mongodb-plugin:
     runs-on: ubuntu-latest
@@ -286,4 +286,4 @@ jobs:
         with:
           files: "MongoDBRepositoryPlugin*"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
