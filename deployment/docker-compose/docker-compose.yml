@@ -35,6 +35,7 @@ services:
       - SYNAPSE_PERSISTENCE_READMODEL_DEFAULT_REPOSITORY=MongoDB
       - CONNECTIONSTRINGS__EVENTSTORE=esdb://eventstore:2113?tls=false
       - CONNECTIONSTRINGS__MONGODB=mongodb://mongo:27017
+      - CLOUDEVENTS_SINK_URI=http://mockservice.orchestrate.svc.cluster.local:6000/sink
     ports:
       - 42286:42286
       - 41387:41387
