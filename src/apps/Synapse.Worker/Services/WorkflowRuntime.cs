@@ -128,7 +128,6 @@ namespace Synapse.Worker.Services
                         this.Logger.LogWarning("==== Pending mtf");
                         break;
                     case V1WorkflowInstanceStatus.Scheduled:   
-                        this.BackgroundJobManager.s
                         this.Logger.LogWarning("==== Scheduled mtf");
                         break;                     
                     case V1WorkflowInstanceStatus.Starting:
