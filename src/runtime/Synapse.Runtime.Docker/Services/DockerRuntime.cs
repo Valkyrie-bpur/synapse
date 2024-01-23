@@ -120,7 +120,7 @@ namespace Synapse.Runtime.Services
                 {
                     Type = "bind",
                     Source = this.Options.Secrets.Directory,
-                    Target = "/run/secrets/synapse"
+                    Target = "/Users/i306392/Downloads/run/secrets/synapse"
                 });
             }
             var createContainerParameters = new CreateContainerParameters(containerConfig)

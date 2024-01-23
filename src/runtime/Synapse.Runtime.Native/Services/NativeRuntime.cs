@@ -98,6 +98,10 @@ namespace Synapse.Runtime.Services
             var workerDirectory = new DirectoryInfo(this.Options.WorkingDirectory);
             if (!workerDirectory.Exists)
                 workerDirectory.Create();
+
+
+            this.Logger.LogInformation("Directory: {dir}", workerDirectory);
+            this.Logger.LogInformation("File: {file}", this.Options.GetWorkerFileName());
             if (File.Exists(this.Options.GetWorkerFileName()))
             {
                 this.Logger.LogInformation("Worker app already present locally. Skipping download."); //todo: config based: the user might want to get latest every time
@@ -113,6 +117,7 @@ namespace Synapse.Runtime.Services
             else
                 throw new PlatformNotSupportedException();
             using var packageStream = await this.HttpClient.GetStreamAsync($"https://github.com/serverlessworkflow/synapse/releases/download/v{typeof(NativeRuntime).Assembly.GetName().Version!.ToString(3)!}/synapse-worker-{target}", cancellationToken); //todo: config based
+
             using ZipArchive archive = new(packageStream, ZipArchiveMode.Read);
             this.Logger.LogInformation("Worker app successfully downloaded. Extracting...");
             archive.ExtractToDirectory(workerDirectory.FullName, true);

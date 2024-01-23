@@ -131,7 +131,7 @@ namespace Synapse.Runtime.Kubernetes.Services
                     }
                 };
                 pod.Spec.Volumes.Add(secretsVolume);
-                var secretsVolumeMount = new V1VolumeMount("/run/secrets/synapse", secretsVolume.Name, readOnlyProperty: true);
+                var secretsVolumeMount = new V1VolumeMount("/Users/i306392/Downloads/run/secrets/synapse", secretsVolume.Name, readOnlyProperty: true);
                 volumeMounts.Add(secretsVolumeMount);
                 foreach (var secret in workflow.Definition.Secrets)
                 {

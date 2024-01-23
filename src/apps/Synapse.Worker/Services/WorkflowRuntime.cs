@@ -18,6 +18,7 @@
 using ConcurrentCollections;
 using Microsoft.Extensions.Hosting;
 using Synapse.Apis.Runtime;
+using Synapse.Infrastructure.Services;
 
 namespace Synapse.Worker.Services
 {
@@ -103,6 +104,11 @@ namespace Synapse.Worker.Services
         /// </summary>
         protected IObservable<V1RuntimeSignal> ServerStream { get; private set; } = null!;
 
+        /// <summary>
+        /// Gets the service used to manage background jobs
+        /// </summary>
+        // protected IBackgroundJobManager BackgroundJobManager { get; }
+
         /// <inheritdoc/>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -122,6 +128,7 @@ namespace Synapse.Worker.Services
                         this.Logger.LogWarning("==== Pending mtf");
                         break;
                     case V1WorkflowInstanceStatus.Scheduled:   
+                        this.BackgroundJobManager.s
                         this.Logger.LogWarning("==== Scheduled mtf");
                         break;                     
                     case V1WorkflowInstanceStatus.Starting:

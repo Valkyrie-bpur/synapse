@@ -21,7 +21,7 @@ namespace Synapse.Worker.Services
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "secrets");
                 else
-                    return "/run/secrets/synapse";
+                    return "/Users/i306392/Downloads/run/secrets/synapse";
             }
         }
 
