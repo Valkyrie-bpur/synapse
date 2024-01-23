@@ -109,14 +109,21 @@ namespace Synapse.Worker.Services
             this.CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
             try
             {
+                this.Logger.LogWarning("==== Cool bitches I am going to create an async context here");
                 await this.Context.InitializeAsync(this.CancellationToken);
+                this.Logger.LogWarning("==== Yes I am done with the creation of the async context ${contextToken} :::", this.CancellationToken);
                 this.ServerStream = this.RuntimeApi.Connect(this.Context.Workflow.Instance.Id).ToObservable();
                 this._ServerSignalStreamSubscription = this.ServerStream.SubscribeAsync(this.OnServerSignalAsync, this.OnServerConnectionErrorAsync, this.OnDisconnectedFromServerAsync);
                 this._OutboundEventStreamSubscription = this.IntegrationEventBus.OutboundStream.SubscribeAsync(this.OnPublishEventAsync);
+                this.Logger.LogWarning("==== Showing the status here ${contextToken} :::", this.Context.Workflow.Instance.Status);
                 switch (this.Context.Workflow.Instance.Status)
                 {
                     case V1WorkflowInstanceStatus.Pending:
-                    case V1WorkflowInstanceStatus.Scheduled:
+                        this.Logger.LogWarning("==== Pending mtf");
+                        break;
+                    case V1WorkflowInstanceStatus.Scheduled:   
+                        this.Logger.LogWarning("==== Scheduled mtf");
+                        break;                     
                     case V1WorkflowInstanceStatus.Starting:
                         await this.StartAsync();
                         break;
