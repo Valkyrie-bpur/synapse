@@ -18,7 +18,6 @@
 using ConcurrentCollections;
 using Microsoft.Extensions.Hosting;
 using Synapse.Apis.Runtime;
-using Synapse.Infrastructure.Services;
 
 namespace Synapse.Worker.Services
 {
