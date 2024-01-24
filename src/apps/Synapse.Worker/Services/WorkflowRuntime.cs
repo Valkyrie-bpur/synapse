@@ -171,6 +171,9 @@ namespace Synapse.Worker.Services
             var activity = await this.Context.Workflow.CreateActivityAsync(V1WorkflowActivityType.State, await this.Context.FilterInputAsync(startState, this.Context.Workflow.Instance.Input, this.CancellationToken), metadata, null, this.CancellationToken);
             var processor = this.CreateActivityProcessor(activity);
             await processor.ProcessAsync(this.CancellationToken);
+
+            //// Make sure to implement a background job for the workflowExecTimeout so that the workflow is automatically stopped after that timeout is exceeded
+            //// This should be done via a server signal that is executed after a specific time
         }
 
         /// <summary>

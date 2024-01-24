@@ -39,11 +39,13 @@ namespace Synapse.Application.Commands.Schedules
         /// <param name="activationType">The type of the <see cref="V1Schedule"/> to create</param>
         /// <param name="definition">The definition of the <see cref="V1Schedule"/> to create</param>
         /// <param name="workflowId">The id of the <see cref="V1Workflow"/> to schedule</param>
-        public V1CreateScheduleCommand(V1ScheduleActivationType activationType, ScheduleDefinition definition, string workflowId)
+        /// <param name="triggerType"></param>
+        public V1CreateScheduleCommand(V1ScheduleActivationType activationType, ScheduleDefinition definition, string workflowId, string triggerType = "instantiate")
         {
             this.ActivationType = activationType;
             this.Definition = definition;
             this.WorkflowId = workflowId;
+            // this.TriggerType = triggerType;
         }
 
         /// <summary>
@@ -60,6 +62,11 @@ namespace Synapse.Application.Commands.Schedules
         /// Gets the id of the <see cref="V1Workflow"/> to schedule
         /// </summary>
         public virtual string WorkflowId { get; protected set; } = null!;
+
+        /// <summary>
+        /// Gets the id of the <see cref="V1Workflow"/> to schedule
+        /// </summary>
+        public virtual string TriggerType { get; protected set; } = null!;
 
     }
 
@@ -110,11 +117,13 @@ namespace Synapse.Application.Commands.Schedules
             if(string.IsNullOrWhiteSpace(workflowId)) throw DomainException.NullReference(typeof(V1Workflow), command.WorkflowId);
             var workflow = await this.Workflows.FindAsync(workflowId, cancellationToken);
             if (workflow == null) throw DomainException.NullReference(typeof(V1Workflow), workflowId);
+
             var schedule = await this.Schedules.AddAsync(new(command.ActivationType, command.Definition, workflow), cancellationToken);
             await this.Schedules.SaveChangesAsync(cancellationToken);
-            if (schedule.NextOccurenceAt.HasValue) await this.BackgroundJobManager.ScheduleJobAsync(schedule, cancellationToken);
+            if (schedule.NextOccurenceAt.HasValue) await this.BackgroundJobManager.ScheduleJobAsync(schedule, cancellationToken, command.TriggerType);
             return this.Ok(this.Mapper.Map<Integration.Models.V1Schedule>(schedule));
         }
+
 
     }
 

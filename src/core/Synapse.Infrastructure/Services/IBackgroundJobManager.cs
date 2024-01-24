@@ -29,9 +29,10 @@ public interface IBackgroundJobManager
     /// <param name="jobId">The unique id of the job to schedule</param>
     /// <param name="job">A <see cref="Func{T, TResult}"/> representing the job to schedule</param>
     /// <param name="scheduleAt">The date and time at which to schedule the job</param>
+    /// <param name="triggerType"></param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
     /// <returns>A new awaitable <see cref="Task"/></returns>
-    Task ScheduleJobAsync(string jobId, Func<IServiceProvider, Task> job, DateTimeOffset scheduleAt, CancellationToken cancellationToken = default);
+    Task ScheduleJobAsync(string jobId, Func<IServiceProvider, Task> job, DateTimeOffset scheduleAt, CancellationToken cancellationToken = default, String triggerType = "instantiate");
 
     /// <summary>
     /// Cancels the specified background job

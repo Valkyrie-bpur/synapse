@@ -38,15 +38,22 @@ namespace Synapse.Application.Commands.Schedules
         /// Initializes a new <see cref="V1TriggerScheduleCommand"/>
         /// </summary>
         /// <param name="scheduleId">The id of the <see cref="V1Schedule"/> to trigger</param>
-        public V1TriggerScheduleCommand(string scheduleId)
+        /// <param name="triggerType"></param>
+        public V1TriggerScheduleCommand(string scheduleId, string triggerType = "instantiate" )
         {
             this.ScheduleId = scheduleId;
+            this.TriggerType = triggerType;
         }
 
         /// <summary>
         /// Gets the id of the <see cref="V1Schedule"/> to trigger
         /// </summary>
         public virtual string ScheduleId { get; protected set; } = null!;
+
+        /// <summary>
+        /// Gets the id of the <see cref="V1Schedule"/> to trigger
+        /// </summary>
+        public virtual string TriggerType { get; protected set; } = null!;
 
     }
 
@@ -88,12 +95,26 @@ namespace Synapse.Application.Commands.Schedules
         {
             var schedule = await this.Schedules.FindAsync(command.ScheduleId, cancellationToken);
             if (schedule == null) throw DomainException.NullReference(typeof(V1Schedule), command.ScheduleId);
-            var workflowInstance = await this.Mediator.ExecuteAndUnwrapAsync(new V1CreateWorkflowInstanceCommand(schedule.WorkflowId, V1WorkflowInstanceActivationType.Schedule, null, null, true, null));
-            schedule.Occur(workflowInstance.Id);
-            schedule = await this.Schedules.UpdateAsync(schedule, cancellationToken);
-            await this.Schedules.SaveChangesAsync(cancellationToken);
-            if (schedule.Definition.Type == ScheduleDefinitionType.Cron && schedule.NextOccurenceAt.HasValue) await this.BackgroundJobManager.ScheduleJobAsync(schedule, cancellationToken);
-            return this.Ok(this.Mapper.Map<Integration.Models.V1Schedule>(schedule));
+
+            if (command.TriggerType.Equals("instantiate")) {
+                // Here we detect whether or not we need to instantiate a new workflow or suspend it when the workflowExecTimeout has been reached
+                var workflowInstance = await this.Mediator.ExecuteAndUnwrapAsync(new V1CreateWorkflowInstanceCommand(schedule.WorkflowId, V1WorkflowInstanceActivationType.Schedule, null, null, true, null));
+
+                schedule.Occur(workflowInstance.Id);
+                schedule = await this.Schedules.UpdateAsync(schedule, cancellationToken);
+                await this.Schedules.SaveChangesAsync(cancellationToken);
+                if (schedule.Definition.Type == ScheduleDefinitionType.Cron && schedule.NextOccurenceAt.HasValue) await this.BackgroundJobManager.ScheduleJobAsync(schedule, cancellationToken);
+                return this.Ok(this.Mapper.Map<Integration.Models.V1Schedule>(schedule));
+            }else {
+                //// Suspend the workflow instance
+                var workflowInstance = await this.Mediator.ExecuteAndUnwrapAsync(new V1SuspendWorkflowInstanceCommand(schedule.WorkflowId));
+
+                // Workflow is suspended so we can delete the job schedule
+                
+                return this.Ok();
+            }
+            
+
         }
 
     }
