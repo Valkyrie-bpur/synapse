@@ -19,6 +19,8 @@ using Neuroglia.Data.Expressions;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Synapse.Application.Queries.Workflows;
+using ServerlessWorkflow.Sdk.Models;
+using Synapse.Application.Commands.Schedules;
 
 namespace Synapse.Application.Commands.WorkflowInstances
 {
@@ -190,6 +192,17 @@ namespace Synapse.Application.Commands.WorkflowInstances
             await this.Workflows.SaveChangesAsync(cancellationToken);
             if (command.AutoStart)
                 await this.Mediator.ExecuteAndUnwrapAsync(new V1StartWorkflowInstanceCommand(workflowInstance.Id), cancellationToken);
+
+            //// If a workflowExecTimeout is specified, then create a new schedule that will run once to suspend the workflow
+            if (workflow.Definition.Timeouts != null && workflow.Definition.Timeouts.WorkflowExecutionTimeout != null) {
+                // We have a timeout defined. We therefore need to create a schedule with the timeout and schedule it so that the workflow gets suspended
+                ScheduleDefinition definition = new() {
+                    Interval = workflow.Definition.Timeouts.WorkflowExecutionTimeout.Duration
+                };                
+                //System.Xml.XmlConvert.ToTimeSpan("PT8H")
+                await this.Mediator.ExecuteAndUnwrapAsync(new V1CreateScheduleCommand(V1ScheduleActivationType.Explicit, definition, workflowInstance.Id, "suspend"));
+            }
+
             return this.Ok(this.Mapper.Map<Integration.Models.V1WorkflowInstance>(workflowInstance));
         }
 

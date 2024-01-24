@@ -58,6 +58,22 @@ namespace Synapse.Domain.Models
         }
 
         /// <summary>
+        /// Initializes a new <see cref="V1Schedule"/>
+        /// </summary>
+        /// <param name="activationType">The <see cref="V1Schedule"/>'s activation type</param>
+        /// <param name="definition">The <see cref="V1Schedule"/>'s <see cref="ScheduleDefinition"/></param>
+        /// <param name="workflowId">The <see cref="String"/> to schedule</param>
+        /// <param name="actionType"></param>
+        public V1Schedule(V1ScheduleActivationType activationType, ScheduleDefinition definition, String workflowId, String actionType)
+            : base(BuildId(workflowId!))
+        {
+            if (definition == null) throw DomainException.ArgumentNull(nameof(definition));
+            if (workflowId == null) throw DomainException.ArgumentNull(nameof(workflowId));
+            this.On(this.RegisterEvent(new V1ScheduleCreatedDomainEvent(this.Id, activationType, definition, workflowId, actionType, definition.GetNextOccurence())));
+        }
+
+
+        /// <summary>
         /// Gets the <see cref="V1Schedule"/>'s activation type
         /// </summary>
         public virtual V1ScheduleActivationType ActivationType { get; protected set; }

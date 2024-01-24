@@ -155,6 +155,7 @@ namespace Synapse.Application.Commands.Workflows
             {
                 await this.Mediator.ExecuteAndUnwrapAsync(new V1CreateScheduleCommand(V1ScheduleActivationType.Implicit, workflow.Definition.Start.Schedule, workflow.Id, "instantiate"), cancellationToken);
             }
+
             return this.Ok(this.Mapper.Map<Integration.Models.V1Workflow>(workflow));
         }
 

@@ -88,11 +88,20 @@ namespace Synapse.Application.Commands.Schedules
         {
             var schedule = await this.Schedules.FindAsync(command.ScheduleId, cancellationToken);
             if (schedule == null) throw DomainException.NullReference(typeof(V1Schedule), command.ScheduleId);
-            var workflowInstance = await this.Mediator.ExecuteAndUnwrapAsync(new V1CreateWorkflowInstanceCommand(schedule.WorkflowId, V1WorkflowInstanceActivationType.Schedule, null, null, true, null));
-            schedule.Occur(workflowInstance.Id);
-            schedule = await this.Schedules.UpdateAsync(schedule, cancellationToken);
-            await this.Schedules.SaveChangesAsync(cancellationToken);
-            if (schedule.Definition.Type == ScheduleDefinitionType.Cron && schedule.NextOccurenceAt.HasValue) await this.BackgroundJobManager.ScheduleJobAsync(schedule, cancellationToken);
+
+            // Check if we need to instantiate or suspend a workflow
+            if (schedule.ActionType.Equals("instantiate")) {
+                var workflowInstance = await this.Mediator.ExecuteAndUnwrapAsync(new V1CreateWorkflowInstanceCommand(schedule.WorkflowId, V1WorkflowInstanceActivationType.Schedule, null, null, true, null));
+                schedule.Occur(workflowInstance.Id);
+                schedule = await this.Schedules.UpdateAsync(schedule, cancellationToken);
+                await this.Schedules.SaveChangesAsync(cancellationToken);
+                if (schedule.Definition.Type == ScheduleDefinitionType.Cron && schedule.NextOccurenceAt.HasValue) await this.BackgroundJobManager.ScheduleJobAsync(schedule, cancellationToken);
+            }else if(schedule.ActionType.Equals("suspend")) {
+                await this.Mediator.ExecuteAndUnwrapAsync(new V1SuspendWorkflowInstanceCommand(schedule.WorkflowId));
+                // Also delete the schedule since we anyways suspended the workflow
+                await this.Mediator.ExecuteAndUnwrapAsync(new V1MakeScheduleObsoleteCommand(schedule.Id));
+            }
+
             return this.Ok(this.Mapper.Map<Integration.Models.V1Schedule>(schedule));
         }
 
