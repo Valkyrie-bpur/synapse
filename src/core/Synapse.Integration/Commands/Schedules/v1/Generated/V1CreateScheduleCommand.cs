@@ -52,6 +52,13 @@ namespace Synapse.Integration.Commands.Schedules
 		[Description("The id of the V1Workflow to schedule")]
 		public virtual string WorkflowId { get; set; }
 
+		/// <summary>
+		/// The id of the V1Workflow to schedule
+		/// </summary>
+		[DataMember(Name = "actionType", Order = 3)]
+		[Description("Whether we should instantiate or suspend a workflow")]
+		public virtual string ActionType { get; set; }
+
     }
 
 }

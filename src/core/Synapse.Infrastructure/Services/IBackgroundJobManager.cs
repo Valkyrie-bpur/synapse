@@ -15,6 +15,7 @@
  *
  */
 
+
 namespace Synapse.Infrastructure.Services;
 
 /// <summary>
@@ -29,11 +30,17 @@ public interface IBackgroundJobManager
     /// <param name="jobId">The unique id of the job to schedule</param>
     /// <param name="job">A <see cref="Func{T, TResult}"/> representing the job to schedule</param>
     /// <param name="scheduleAt">The date and time at which to schedule the job</param>
-    /// <param name="triggerType"></param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
     /// <returns>A new awaitable <see cref="Task"/></returns>
-    Task ScheduleJobAsync(string jobId, Func<IServiceProvider, Task> job, DateTimeOffset scheduleAt, CancellationToken cancellationToken = default, String triggerType = "instantiate");
-
+    Task ScheduleJobAsync(string jobId, Func<IServiceProvider, Task> job, DateTimeOffset scheduleAt, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Schedules a new background job
+    /// </summary>
+    /// <param name="schedule">The unique id of the job to schedule</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
+    /// <returns>A new awaitable <see cref="Task"/></returns>
+    Task ScheduleJobAsync(V1Schedule schedule, CancellationToken cancellationToken);
     /// <summary>
     /// Cancels the specified background job
     /// </summary>
@@ -41,6 +48,4 @@ public interface IBackgroundJobManager
     /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
     /// <returns>A new awaitable <see cref="Task"/></returns>
     Task CancelJobAsync(string jobId, CancellationToken cancellationToken = default);
-
 }
-

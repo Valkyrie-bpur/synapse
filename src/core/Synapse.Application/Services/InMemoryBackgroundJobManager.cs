@@ -46,7 +46,7 @@ public class InMemoryBackgroundJobManager
     protected ConcurrentDictionary<string, BackgroundJob> BackgroundJobs { get; } = new();
 
     /// <inheritdoc/>
-    public virtual Task ScheduleJobAsync(string jobId, Func<IServiceProvider, Task> job, DateTimeOffset scheduleAt, CancellationToken cancellationToken = default, String triggerType = "instantiate")
+    public virtual Task ScheduleJobAsync(string jobId, Func<IServiceProvider, Task> job, DateTimeOffset scheduleAt, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(jobId)) throw new ArgumentNullException(nameof(jobId));
         if (job == null) throw new ArgumentNullException(nameof(job));
@@ -58,6 +58,12 @@ public class InMemoryBackgroundJobManager
         }
         backgroundJob.Schedule(scheduleAt);
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    public Task ScheduleJobAsync(V1Schedule schedule, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 
     /// <inheritdoc/>

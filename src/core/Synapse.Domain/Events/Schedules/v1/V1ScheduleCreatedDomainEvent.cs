@@ -40,12 +40,13 @@ namespace Synapse.Domain.Events.Schedules
         /// <param name="definition">The definition of the newly created <see cref="V1Schedule"/></param>
         /// <param name="workflowId">The id of the <see cref="V1Workflow"/> scheduled by the newly created <see cref="V1Schedule"/></param>
         /// <param name="nextOccurenceAt">The date and time at which the <see cref="V1Schedule"/> will next occur</param>
-        public V1ScheduleCreatedDomainEvent(string id, V1ScheduleActivationType activationType, ScheduleDefinition definition, string workflowId, DateTimeOffset? nextOccurenceAt)
+        public V1ScheduleCreatedDomainEvent(string id, V1ScheduleActivationType activationType, ScheduleDefinition definition, string workflowId, string actionType, DateTimeOffset? nextOccurenceAt)
             : base(id)
         {
             this.ActivationType = activationType;
             this.Definition = definition;
             this.WorkflowId = workflowId;
+            this.ActionType = actionType;
             this.NextOccurenceAt = nextOccurenceAt;
         }
 
@@ -63,6 +64,11 @@ namespace Synapse.Domain.Events.Schedules
         /// Gets the id of the <see cref="V1Workflow"/> scheduled by the newly created <see cref="V1Schedule"/>
         /// </summary>
         public virtual string WorkflowId { get; protected set; } = null!;
+
+        /// <summary>
+        /// Gets the type of action to perform in the schedule; either 'instantiate' or 'suspend'
+        /// </summary>
+        public virtual string ActionType { get; protected set; } = null!;
 
         /// <summary>
         /// Gets the <see cref="V1Schedule"/>'s next occurence

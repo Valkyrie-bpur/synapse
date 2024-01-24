@@ -48,12 +48,13 @@ namespace Synapse.Domain.Models
         /// <param name="activationType">The <see cref="V1Schedule"/>'s activation type</param>
         /// <param name="definition">The <see cref="V1Schedule"/>'s <see cref="ScheduleDefinition"/></param>
         /// <param name="workflow">The <see cref="V1Workflow"/> to schedule</param>
-        public V1Schedule(V1ScheduleActivationType activationType, ScheduleDefinition definition, V1Workflow workflow)
+        /// <param name="actionType"></param>
+        public V1Schedule(V1ScheduleActivationType activationType, ScheduleDefinition definition, V1Workflow workflow, String actionType)
             : base(BuildId(workflow?.Id!))
         {
             if (definition == null) throw DomainException.ArgumentNull(nameof(definition));
             if (workflow == null) throw DomainException.ArgumentNull(nameof(workflow));
-            this.On(this.RegisterEvent(new V1ScheduleCreatedDomainEvent(this.Id, activationType, definition, workflow.Id, definition.GetNextOccurence())));
+            this.On(this.RegisterEvent(new V1ScheduleCreatedDomainEvent(this.Id, activationType, definition, workflow.Id, actionType, definition.GetNextOccurence())));
         }
 
         /// <summary>
@@ -75,6 +76,11 @@ namespace Synapse.Domain.Models
         /// Gets the id of the scheduled <see cref="V1Workflow"/>
         /// </summary>
         public virtual string WorkflowId { get; protected set; } = null!;
+
+        /// <summary>
+        /// Defines if this will instantiate a new workflow or suspend an existing workflow instance
+        /// </summary>
+        public virtual String ActionType { get; protected set; } = null!;
 
         /// <summary>
         /// Gets the date and time the <see cref="V1Schedule"/> has last been suspended at
@@ -207,6 +213,7 @@ namespace Synapse.Domain.Models
             this.Definition = e.Definition;
             this.WorkflowId = e.WorkflowId;
             this.NextOccurenceAt = e.NextOccurenceAt;
+            this.ActionType = e.ActionType;
         }
 
         /// <summary>

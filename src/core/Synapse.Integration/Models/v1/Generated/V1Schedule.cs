@@ -61,6 +61,13 @@ namespace Synapse.Integration.Models
 		public virtual string WorkflowId { get; set; }
 
 		/// <summary>
+		/// The id of the scheduled V1Workflow
+		/// </summary>
+		[DataMember(Name = "actionType", Order = 11)]
+		[Description("The action type that the job schould execute")]
+		public virtual string ActionType { get; set; }
+
+		/// <summary>
 		/// The date and time the V1Schedule has last been suspended at
 		/// </summary>
 		[DataMember(Name = "suspendedAt", Order = 5)]
