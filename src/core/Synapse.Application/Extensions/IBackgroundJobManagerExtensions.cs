@@ -33,17 +33,11 @@ namespace Synapse
         /// <param name="schedule">An object that defines the background job to schedule</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
         /// <returns>A new awaitable <see cref="Task"/></returns>
-        public static async Task ScheduleJobAsync(this IBackgroundJobManager backgroundJobManager, string id, V1Schedule schedule, CancellationToken cancellationToken = default)
+        public static async Task ScheduleJobAsync(this IBackgroundJobManager backgroundJobManager, V1Schedule schedule, CancellationToken cancellationToken = default)
         {
             if (schedule == null) throw new ArgumentNullException(nameof(schedule));
             if (!schedule.NextOccurenceAt.HasValue) throw new ArgumentException("The specified schedule does not define a next occurence", nameof(schedule));
-
-            if (schedule.ActionType.Equals("instantiate")) {
-                await backgroundJobManager.ScheduleJobAsync(schedule.Id, async provider => await OnInstanciateWorkflowAsync(provider, schedule.Id), schedule.NextOccurenceAt.Value, cancellationToken);
-            }else {
-                await backgroundJobManager.ScheduleJobAsync(schedule.Id, async provider => await OnSuspendWorkflowAsync(provider, schedule.Id), schedule.NextOccurenceAt.Value, cancellationToken);
-            }
-            
+            await backgroundJobManager.ScheduleJobAsync(schedule.Id, async provider => await OnInstanciateWorkflowAsync(provider, schedule.Id), schedule.NextOccurenceAt.Value, cancellationToken);
         }
 
         /// <summary>
@@ -61,12 +55,6 @@ namespace Synapse
         }
 
         private static async Task OnInstanciateWorkflowAsync(IServiceProvider serviceProvider, string scheduleId)
-        {
-            var mediator = serviceProvider.GetRequiredService<IMediator>();
-            await mediator.ExecuteAndUnwrapAsync(new V1TriggerScheduleCommand(scheduleId));
-        }
-
-        private static async Task OnSuspendWorkflowAsync(IServiceProvider serviceProvider, string scheduleId)
         {
             var mediator = serviceProvider.GetRequiredService<IMediator>();
             await mediator.ExecuteAndUnwrapAsync(new V1TriggerScheduleCommand(scheduleId));
