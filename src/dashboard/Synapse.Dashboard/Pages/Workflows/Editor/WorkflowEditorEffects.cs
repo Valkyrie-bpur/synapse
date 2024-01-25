@@ -221,6 +221,7 @@ namespace Synapse.Dashboard.Pages.Workflows.Editor.Effects
                 throw new NullReferenceException("Unable to resolved service 'IWorkflowValidator'.");
             var validationResult = await workflowValidator.ValidateAsync(action.WorkflowDefinition, false, true);
             var validationMessages = new List<string>();
+
             if (!validationResult.IsValid)
             {
                 validationResult.SchemaValidationErrors.ToList().ForEach(error =>

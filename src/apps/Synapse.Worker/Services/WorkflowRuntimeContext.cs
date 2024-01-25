@@ -112,10 +112,13 @@ namespace Synapse.Worker.Services
                     throw new NullReferenceException($"Failed to find a workflow instance with the specified id '{workflowInstanceId}'");
                 this.Logger.LogInformation("Retrieving definition of workflow with id '{workflowInstance.WorkflowId}'...", workflowInstance.WorkflowId);
                 var workflow = await this.ManagementApi.GetWorkflowByIdAsync(workflowInstance.WorkflowId, cancellationToken);
+                this.Logger.LogInformation("=== Got me a workflow {workflow}", workflow);
                 if (workflow == null)
                     throw new NullReferenceException($"Failed to find a workflow with the specified id '{workflowInstance.WorkflowId}'");
                 var workflowDefinition = await this.WorkflowExternalDefinitionResolver.LoadExternalDefinitionsAsync(workflow.Definition, new(), cancellationToken);
+                this.Logger.LogInformation("=== Got me a workflow definition {def}", workflowDefinition);
                 this.ExpressionEvaluator = this.ExpressionEvaluatorProvider.GetEvaluator(workflow.Definition.ExpressionLanguage)!;
+                this.Logger.LogInformation("=== Got me an expression evaluator {express}", ExpressionEvaluator);
                 if (this.ExpressionEvaluator == null)
                     throw new NullReferenceException($"Failed to find an expression evaluator for language '{workflow.Definition.ExpressionLanguage}'");
                 this.Workflow = ActivatorUtilities.CreateInstance<WorkflowFacade>(this.ServiceProvider, workflowInstance, workflowDefinition);
