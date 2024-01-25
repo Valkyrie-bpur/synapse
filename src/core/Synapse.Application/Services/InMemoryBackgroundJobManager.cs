@@ -61,6 +61,12 @@ public class InMemoryBackgroundJobManager
     }
 
     /// <inheritdoc/>
+    public Task ScheduleJobAsync(V1Schedule schedule, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
     public virtual Task CancelJobAsync(string jobId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(jobId)) throw new ArgumentNullException(nameof(jobId));
