@@ -60,7 +60,6 @@ FROM build AS publish
 WORKDIR "/src/src/apps/Synapse.Server"
 RUN dotnet publish "Synapse.Server.csproj" -c Release -o /app/publish
 
-
 # Publish Synapse.Plugins.Persistence.EventStore
 WORKDIR "/src/src/plugins/persistence/Synapse.Plugins.Persistence.EventStore"
 RUN dotnet publish "Synapse.Plugins.Persistence.EventStore.csproj" -c Release -o /app/publish/plugins/Synapse.Plugins.Persistence.EventStore

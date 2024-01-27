@@ -83,23 +83,15 @@ spec:
     metadata:
       labels:
         app: synapse
-        version: '0.0.2'
+        version: '0.0.25'
       annotations:
         traffic.sidecar.istio.io/excludeOutboundIPRanges: 10.96.0.1/32
     spec:
       serviceAccountName: synapse
-      volumes:
-      - name: plugins
-        hostPath:
-          path: /Users/i306392/Documents/Visual Studio Code Workspace.nosync/Valkyrie/synapse/src/plugins
       containers:
         - name: synapse
-          image: bpurnot/synapse:0.0.23
+          image: bpurnot/synapse:0.0.25
           imagePullPolicy: IfNotPresent
-          volumeMounts:
-          - mountPath: /app/plugins
-            name: plugins
-            readOnly: true
           env:
             - name: KUBERNETES_POD_NAME
               valueFrom:
