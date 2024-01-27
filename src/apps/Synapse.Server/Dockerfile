@@ -28,8 +28,8 @@ COPY ["src/apis/management/Synapse.Apis.Management.Grpc.Client/Synapse.Apis.Mana
 COPY ["src/dashboard/Synapse.Dashboard/Synapse.Dashboard.csproj", "src/dashboard/Synapse.Dashboard/"]
 COPY ["src/runtime/Synapse.Runtime.Native/Synapse.Runtime.Native.csproj", "src/runtime/Synapse.Runtime.Native/"]
 
-COPY ["src/plugins/Synapse.Plugins.Persistence.EventStore/Synapse.Plugins.Persistence.EventStore.csproj", "src/plugins/Synapse.Plugins.Persistence.EventStore/"]
-COPY ["src/plugins/Synapse.Plugins.Persistence.MongoDB/Synapse.Plugins.Persistence.MongoDB.csproj", "src/plugins/Synapse.Plugins.Persistence.MongoDB/"]
+#COPY ["src/plugins/Synapse.Plugins.Persistence.EventStore/Synapse.Plugins.Persistence.EventStore.csproj", "src/plugins/Synapse.Plugins.Persistence.EventStore/"]
+#COPY ["src/plugins/Synapse.Plugins.Persistence.MongoDB/Synapse.Plugins.Persistence.MongoDB.csproj", "src/plugins/Synapse.Plugins.Persistence.MongoDB/"]
 
 RUN dotnet restore "src/apps/Synapse.Server/Synapse.Server.csproj"
 COPY . .
