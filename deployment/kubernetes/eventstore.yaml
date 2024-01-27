@@ -88,6 +88,8 @@ spec:
         traffic.sidecar.istio.io/excludeOutboundIPRanges: 10.96.0.1/32
     spec:
       serviceAccountName: synapse
+      volumes:
+      - ./plugins:/app/plugins
       containers:
         - name: synapse
           image: bpurnot/synapse:0.0.20
@@ -101,7 +103,18 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: SYNAPSE_SKIP_CERTIFICATE_VALIDATION
+              value: "true"
+            - name: SYNAPSE_PERSISTENCE_WRITEMODEL_DEFAULT_REPOSITORY
+              value: EventStore
+            - name: SYNAPSE_PERSISTENCE_READMODEL_DEFAULT_REPOSITORY
+              value: MongoDB
+            - name: CONNECTIONSTRINGS__EVENTSTORE
+              value: "esdb://event-store:2113?tls=false"
+            - name: CONNECTIONSTRINGS__MONGODB
+              value: "mongodb+srv://db-user:kXbvvrQNwtVxfaRs@cluster0.jgvhjnr.mongodb.net/synapse?retryWrites=true&w=majority"
 ---
 
 apiVersion: v1
