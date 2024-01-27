@@ -55,7 +55,11 @@ WORKDIR "/src/src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB"
 RUN dotnet build "Synapse.Plugins.Persistence.MongoDB.csproj" -c Release -o /app/build/plugins/mongo
 
 FROM build AS publish
+
+# Publish Synapse.Server
+WORKDIR "/src/src/apps/Synapse.Server"
 RUN dotnet publish "Synapse.Server.csproj" -c Release -o /app/publish
+
 
 # Publish Synapse.Plugins.Persistence.EventStore
 WORKDIR "/src/src/plugins/persistence/Synapse.Plugins.Persistence.EventStore"
