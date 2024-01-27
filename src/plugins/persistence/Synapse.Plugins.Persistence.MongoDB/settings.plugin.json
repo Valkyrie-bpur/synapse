@@ -1,5 +1,5 @@
 ﻿{
   "ConnectionStrings": {
-    "MongoDB": "mongodb+srv://db-user:kXbvvrQNwtVxfaRs@cluster0.jgvhjnr.mongodb.net/?retryWrites=true&w=majority"
+    "MongoDB": "mongodb+srv://db-user:kXbvvrQNwtVxfaRs@cluster0.jgvhjnr.mongodb.net/synapse?retryWrites=true&w=majority"
   }
 }
