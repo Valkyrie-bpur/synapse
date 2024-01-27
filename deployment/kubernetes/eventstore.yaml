@@ -83,17 +83,23 @@ spec:
     metadata:
       labels:
         app: synapse
-        version: '0.0.20'
+        version: '0.0.2'
       annotations:
         traffic.sidecar.istio.io/excludeOutboundIPRanges: 10.96.0.1/32
     spec:
       serviceAccountName: synapse
       volumes:
-      - ./plugins:/app/plugins
+      - name: plugins
+        hostPath:
+          path: /Users/i306392/Documents/Visual Studio Code Workspace.nosync/Valkyrie/synapse/src/plugins
       containers:
         - name: synapse
-          image: bpurnot/synapse:0.0.20
+          image: bpurnot/synapse:0.0.23
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /app/plugins
+            name: plugins
+            readOnly: true
           env:
             - name: KUBERNETES_POD_NAME
               valueFrom:
@@ -114,7 +120,10 @@ spec:
             - name: CONNECTIONSTRINGS__EVENTSTORE
               value: "esdb://event-store:2113?tls=false"
             - name: CONNECTIONSTRINGS__MONGODB
-              value: "mongodb+srv://db-user:kXbvvrQNwtVxfaRs@cluster0.jgvhjnr.mongodb.net/synapse?retryWrites=true&w=majority"
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: connection-string
 ---
 
 apiVersion: v1

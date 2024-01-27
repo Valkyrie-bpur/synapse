@@ -5,6 +5,7 @@ WORKDIR /app
 EXPOSE 42286 41387
 RUN apt-get update
 RUN apt-get install -y jq
+RUN apt-get -y install curl
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
@@ -28,16 +29,41 @@ COPY ["src/apis/management/Synapse.Apis.Management.Grpc.Client/Synapse.Apis.Mana
 COPY ["src/dashboard/Synapse.Dashboard/Synapse.Dashboard.csproj", "src/dashboard/Synapse.Dashboard/"]
 COPY ["src/runtime/Synapse.Runtime.Native/Synapse.Runtime.Native.csproj", "src/runtime/Synapse.Runtime.Native/"]
 
-#COPY ["src/plugins/Synapse.Plugins.Persistence.EventStore/Synapse.Plugins.Persistence.EventStore.csproj", "src/plugins/Synapse.Plugins.Persistence.EventStore/"]
-#COPY ["src/plugins/Synapse.Plugins.Persistence.MongoDB/Synapse.Plugins.Persistence.MongoDB.csproj", "src/plugins/Synapse.Plugins.Persistence.MongoDB/"]
+COPY ["src/plugins/persistence/Synapse.Plugins.Persistence.EventStore/plugin.json", "src/plugins/persistence/Synapse.Plugins.Persistence.EventStore/"]
+COPY ["src/plugins/persistence/Synapse.Plugins.Persistence.EventStore/Synapse.Plugins.Persistence.EventStore.csproj", "src/plugins/persistence/Synapse.Plugins.Persistence.EventStore/"]
+
+COPY ["src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB/plugin.json", "src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB/"]
+COPY ["src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB/Synapse.Plugins.Persistence.MongoDB.csproj", "src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB/"]
 
 RUN dotnet restore "src/apps/Synapse.Server/Synapse.Server.csproj"
 COPY . .
 WORKDIR "/src/src/apps/Synapse.Server"
 RUN dotnet build "Synapse.Server.csproj" -c Release -o /app/build
 
+# Build Synapse.Plugins.Persistence.EventStore
+WORKDIR /src
+RUN dotnet restore "src/plugins/persistence/Synapse.Plugins.Persistence.EventStore/Synapse.Plugins.Persistence.EventStore.csproj"
+COPY . .
+WORKDIR "/src/src/plugins/persistence/Synapse.Plugins.Persistence.EventStore"
+RUN dotnet build "Synapse.Plugins.Persistence.EventStore.csproj" -c Release -o /app/build/plugins/eventstore
+
+# Build Synapse.Plugins.Persistence.MongoDB
+WORKDIR /src
+RUN dotnet restore "src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB/Synapse.Plugins.Persistence.MongoDB.csproj"
+COPY . .
+WORKDIR "/src/src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB"
+RUN dotnet build "Synapse.Plugins.Persistence.MongoDB.csproj" -c Release -o /app/build/plugins/mongo
+
 FROM build AS publish
 RUN dotnet publish "Synapse.Server.csproj" -c Release -o /app/publish
+
+# Publish Synapse.Plugins.Persistence.EventStore
+WORKDIR "/src/src/plugins/persistence/Synapse.Plugins.Persistence.EventStore"
+RUN dotnet publish "Synapse.Plugins.Persistence.EventStore.csproj" -c Release -o /app/publish/plugins/Synapse.Plugins.Persistence.EventStore
+
+# Publish Synapse.Plugins.Persistence.MongoDB
+WORKDIR "/src/src/plugins/persistence/Synapse.Plugins.Persistence.MongoDB"
+RUN dotnet publish "Synapse.Plugins.Persistence.MongoDB.csproj" -c Release -o /app/publish/plugins/Synapse.Plugins.Persistence.MongoDB
 
 FROM base AS final
 WORKDIR /app
