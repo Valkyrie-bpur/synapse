@@ -1,5 +1,5 @@
 ﻿{
   "ConnectionStrings": {
-    "MongoDB": "mongodb://localhost:27017"
+    "MongoDB": "mongodb+srv://db-user:kXbvvrQNwtVxfaRs@cluster0.jgvhjnr.mongodb.net/?retryWrites=true&w=majority"
   }
 }

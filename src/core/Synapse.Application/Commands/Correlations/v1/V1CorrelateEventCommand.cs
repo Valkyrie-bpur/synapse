@@ -20,7 +20,7 @@ using Synapse.Application.Queries.Correlations;
 
 namespace Synapse.Application.Commands.Correlations
 {
-
+    
     /// <summary>
     /// Represents the <see cref="ICommand"/> used to correlate a <see cref="V1Event"/>
     /// </summary>

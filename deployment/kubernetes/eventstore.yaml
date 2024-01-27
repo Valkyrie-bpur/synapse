@@ -10,43 +10,6 @@ kind: ServiceAccount
 metadata:
   name: synapse
   namespace: synapse
-  
----
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mongo
-  namespace: synapse
-spec:
-  selector:
-    matchLabels:
-      app: mongo
-  template:
-    metadata:
-      labels:
-        app: mongo
-    spec:
-      containers:
-      - name: mongo
-        image: mongo:latest
-                
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongo
-  namespace: synapse
-  labels: 
-    app: mongo
-spec:
-  ports:
-    - name: tcp
-      port: 27017
-      protocol: TCP
-  selector:
-    app: mongo
     
 ---
 apiVersion: apps/v1
