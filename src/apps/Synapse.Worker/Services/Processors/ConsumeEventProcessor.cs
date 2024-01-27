@@ -83,6 +83,7 @@ namespace Synapse.Worker.Services.Processors
         /// <inheritdoc/>
         protected override async Task ProcessAsync(CancellationToken cancellationToken)
         {
+            this.Logger.LogInformation("==== ConsumeEventProcessor start ");
             this.Subscription = this.IntegrationEventBus.InboundStream.SubscribeAsync(this.OnEventAsync);
             var e = await this.Context.Workflow.ConsumeOrBeginCorrelateEventAsync(this.EventDefinition, cancellationToken);
             if (e != null)

@@ -118,11 +118,10 @@ namespace Synapse.Application.Commands.Schedules
                 if(string.IsNullOrWhiteSpace(workflowId)) throw DomainException.NullReference(typeof(V1Workflow), command.WorkflowId);
                 var workflow = await this.Workflows.FindAsync(workflowId, cancellationToken);
                 if (workflow == null) throw DomainException.NullReference(typeof(V1Workflow), workflowId);
-
                 var schedule = await this.Schedules.AddAsync(new(command.ActivationType, command.Definition, workflow, command.ActionType), cancellationToken);
                 await this.Schedules.SaveChangesAsync(cancellationToken);
                 if (schedule.NextOccurenceAt.HasValue) await this.BackgroundJobManager.ScheduleJobAsync(schedule, cancellationToken);
-                return this.Ok(this.Mapper.Map<Integration.Models.V1Schedule>(schedule));          
+                return this.Ok(this.Mapper.Map<Integration.Models.V1Schedule>(schedule));
             }else {
                 // var workflowInstance =  (V1WorkflowInstance) await this.Mediator.ExecuteAsync(new Application.Queries.Generic.V1FindByIdQuery<V1WorkflowInstance, string>(command.WorkflowId), cancellationToken);
                 var schedule = await this.Schedules.AddAsync(new(command.ActivationType, command.Definition, command.WorkflowId, command.ActionType), cancellationToken);

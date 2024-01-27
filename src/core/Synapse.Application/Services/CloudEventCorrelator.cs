@@ -61,6 +61,7 @@ namespace Synapse.Application.Services
         {
             this.CloudEventStream.SubscribeAsync(async e =>
             {
+                this.Logger.LogDebug("A new event was received in the CloudEventCorrelator.cs : {ex}", e);
                 using var scope = this.ServiceProvider.CreateScope();
                 await this.CorrelateAsync(scope.ServiceProvider, e, stoppingToken);
             });
