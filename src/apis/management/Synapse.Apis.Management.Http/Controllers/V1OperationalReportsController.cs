@@ -42,7 +42,7 @@ namespace Synapse.Apis.Management.Http.Controllers
         /// <param name="queryOptions">The date for which to get the <see cref="V1OperationalReport"/>. Defaults to today</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
         /// <returns>A new <see cref="IActionResult"/></returns>
-        [HttpGet]
+        [HttpGet("all")]
         [ProducesResponseType(typeof(IEnumerable<V1OperationalReport>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
