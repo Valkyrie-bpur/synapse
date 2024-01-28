@@ -39,6 +39,22 @@ namespace Synapse.Apis.Management.Http.Controllers
         /// <summary>
         /// Gets the <see cref="V1OperationalReport"/> for the specified date
         /// </summary>
+        /// <param name="queryOptions">The date for which to get the <see cref="V1OperationalReport"/>. Defaults to today</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
+        /// <returns>A new <see cref="IActionResult"/></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<V1OperationalReport>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        public async Task<IActionResult> GetOperationalReports(ODataQueryOptions<V1OperationalReport> queryOptions, CancellationToken cancellationToken = default)
+        {
+            return this.Process(await this.Mediator.ExecuteAsync(new Application.Queries.Generic.V1FilterQuery<V1OperationalReport>(queryOptions), cancellationToken));
+        }
+
+        /// <summary>
+        /// Gets the <see cref="V1OperationalReport"/> for the specified date
+        /// </summary>
         /// <param name="date">The date for which to get the <see cref="V1OperationalReport"/>. Defaults to today</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/></param>
         /// <returns>A new <see cref="IActionResult"/></returns>
