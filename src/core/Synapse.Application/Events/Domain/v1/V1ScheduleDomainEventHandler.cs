@@ -102,6 +102,7 @@ namespace Synapse.Application.Events.Domain.v1
             schedule.ActiveOccurences.Add(e.WorkflowInstanceId);
             await this.Projections.UpdateAsync(schedule, cancellationToken);
             await this.Projections.SaveChangesAsync(cancellationToken);
+            
             await this.PublishIntegrationEventAsync(e, cancellationToken);
         }
 

@@ -157,7 +157,10 @@ namespace Synapse.Domain.Models
         public virtual void CompleteOccurence(string workflowInstanceId)
         {
             if(this.Status != V1ScheduleStatus.Active) throw DomainException.UnexpectedState(typeof(V1Schedule), this.Id, this.Status);
-            this.On(this.RegisterEvent(new V1ScheduleOccurenceCompletedDomainEvent(this.Id, workflowInstanceId, this.Definition.Type == ScheduleDefinitionType.Interval ? this.Definition.GetNextOccurence() : null)));
+
+            ////this.On(this.RegisterEvent(new V1ScheduleOccurenceCompletedDomainEvent(this.Id, workflowInstanceId, this.Definition.Type == ScheduleDefinitionType.Interval ? this.Definition.GetNextOccurence() : null)));
+            //// Bugfix: why is the next occurence only added when the type of the schedule is an interval??
+            this.On(this.RegisterEvent(new V1ScheduleOccurenceCompletedDomainEvent(this.Id, workflowInstanceId, this.Definition.GetNextOccurence())));
         }
 
         /// <summary>
