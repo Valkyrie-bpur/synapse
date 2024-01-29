@@ -494,6 +494,9 @@ namespace Synapse.Worker.Services
             }
             else
             {
+                this.Logger.LogWarning("=== Transitioning to this state {ex}", processor.State.Transition);
+                this.Logger.LogWarning("=== Transitioning to this state {ex}", V1WorkflowActivityType.Transition);
+
                 if (processor.State.Transition != null
                     || !string.IsNullOrWhiteSpace(processor.State.TransitionToStateName))
                     await this.Context.Workflow.CreateActivityAsync(V1WorkflowActivityType.Transition, e.Output!.ToObject()!, metadata, null, this.CancellationToken);
