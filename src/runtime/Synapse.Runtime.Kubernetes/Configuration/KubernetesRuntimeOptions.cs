@@ -47,7 +47,8 @@ namespace Synapse.Runtime.Kubernetes.Configuration
                 {
                     new V1Container("synapse-worker")
                     {
-                        Image = $"bpurnot/synapse-worker:{typeof(KubernetesRuntimeOptions).Assembly.GetName().Version!.ToString(3)}",
+                        ////Image = $"bpurnot/synapse-worker:{typeof(KubernetesRuntimeOptions).Assembly.GetName().Version!.ToString(3)}",
+                        Image = $"bpurnot/synapse-worker:0.0.32",
                         ImagePullPolicy = "Always",
                         Ports = new List<V1ContainerPort>()
                         {
