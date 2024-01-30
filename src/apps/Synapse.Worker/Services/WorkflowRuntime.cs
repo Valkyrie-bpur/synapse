@@ -350,6 +350,7 @@ namespace Synapse.Worker.Services
         /// <param name="activity">The <see cref="V1WorkflowActivity"/> to create a child <see cref="IWorkflowActivityProcessor"/> for</param>
         protected virtual IWorkflowActivityProcessor CreateActivityProcessor(V1WorkflowActivity activity)
         {
+            this.Logger.LogDebug("==== CreateActivityProcessor, {e}", activity);
             if (activity == null)
                 throw new ArgumentNullException(nameof(activity));
             IWorkflowActivityProcessor processor = this.ActivityProcessorFactory.Create(activity);
@@ -496,8 +497,9 @@ namespace Synapse.Worker.Services
             {
                 this.Logger.LogWarning("=== Transitioning to this state {ex}", processor.State.Transition);
                 this.Logger.LogWarning("=== Transitioning to this state {ex}", V1WorkflowActivityType.Transition);
-                this.Logger.LogWarning("=== Is it the end {ex}", V1WorkflowActivityType.End);
+                this.Logger.LogWarning("=== Is it the end {ex}", processor.State.End);
                 this.Logger.LogWarning("=== What is the State {ex}", processor.State);
+                this.Logger.LogWarning("====== Object {e}: ", e.Output!.ToObject());
 
                 if (processor.State.Transition != null
                     || !string.IsNullOrWhiteSpace(processor.State.TransitionToStateName))
