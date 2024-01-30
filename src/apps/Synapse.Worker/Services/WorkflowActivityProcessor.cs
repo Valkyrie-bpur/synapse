@@ -92,6 +92,7 @@ namespace Synapse.Worker.Services
 
         Task IWorkflowActivityProcessor.ProcessAsync(CancellationToken cancellationToken)
         {
+            this.Logger.LogInformation("===== Is this still being executed?????");
             this.CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             Task.Factory.StartNew(async () =>
             {

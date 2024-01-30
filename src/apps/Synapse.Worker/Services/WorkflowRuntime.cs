@@ -499,7 +499,7 @@ namespace Synapse.Worker.Services
                 this.Logger.LogWarning("=== Transitioning to this state {ex}", V1WorkflowActivityType.Transition);
                 this.Logger.LogWarning("=== Is it the end {ex}", processor.State.End);
                 this.Logger.LogWarning("=== What is the State {ex}", processor.State);
-                this.Logger.LogWarning("====== Object {e}: ", e.Output!.ToObject());
+                this.Logger.LogWarning("====== Object {e} ", e.Output!.ToObject());
 
                 if (processor.State.Transition != null
                     || !string.IsNullOrWhiteSpace(processor.State.TransitionToStateName))
