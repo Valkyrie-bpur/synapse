@@ -496,6 +496,8 @@ namespace Synapse.Worker.Services
             {
                 this.Logger.LogWarning("=== Transitioning to this state {ex}", processor.State.Transition);
                 this.Logger.LogWarning("=== Transitioning to this state {ex}", V1WorkflowActivityType.Transition);
+                this.Logger.LogWarning("=== Is it the end {ex}", V1WorkflowActivityType.End);
+                this.Logger.LogWarning("=== What is the State {ex}", processor.State);
 
                 if (processor.State.Transition != null
                     || !string.IsNullOrWhiteSpace(processor.State.TransitionToStateName))
